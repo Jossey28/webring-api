@@ -1,11 +1,13 @@
 from fastapi import FastAPI
+from fastapi_globals import GlobalsMiddleware, g
 import uvicorn
 
 from setup import init_app
+from helpers.json_helpers import Member
 
 # import helpers.json_models as json_models
 
-app = FastAPI()
+app = FastAPI(title="Webring API")
 
 
 @app.get("/")
@@ -24,9 +26,14 @@ def update_item(item_id: int, item: Item):  # type: ignore
 
 
 def main():
-    init_app()
+    config = init_app()
 
-    uvicorn.run("main:app", host="localhost", port=8080, reload=True)
+    g.api_key = config.api_key
+    g.json_path = config.json_path
+
+    print(Member.model_json_schema())
+
+    # uvicorn.run("main:app", host="localhost", port=8080, reload=True)
 
 
 if __name__ == "__main__":
