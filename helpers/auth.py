@@ -6,7 +6,7 @@ api_key_query = APIKeyQuery(name="api-key", auto_error=False)
 api_key_header = APIKeyHeader(name="x-api-key", auto_error=False)
 
 
-def get_api_key(
+def get_api_key(  # https://joshdimella.com/blog/adding-api-key-auth-to-fast-api#understanding-api-key-authentication
     api_key_query: str = Security(api_key_query),
     api_key_header: str = Security(api_key_header),
 ) -> str:

@@ -3,7 +3,7 @@ from fastapi_globals import GlobalsMiddleware, g
 import uvicorn
 
 from setup import init_app
-from helpers.json_helpers import Member
+from helpers.json_helpers import load_data
 
 # import helpers.json_models as json_models
 
@@ -32,7 +32,8 @@ def main():
     g.api_key = config.api_keys
     g.json_path = config.json_path
 
-    # uvicorn.run("main:app", host="localhost", port=8080, reload=True)
+    load_data()
+    uvicorn.run("main:app", host="localhost", port=8080, reload=True)
 
 
 if __name__ == "__main__":

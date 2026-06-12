@@ -27,8 +27,13 @@ def init_app() -> Config:
             try:
                 f = open("data/database.jsonl", "x")
                 f.close()
+                print(
+                    "Created the file for you. Use the example file to create your own webring"
+                )
+                sys.exit(1)
             except FileExistsError:
                 print("./data/database.jsonl file already exists. Using that")
+                json_path = Path("./data/database.jsonl")
             except Exception as e:
                 import sys
 
