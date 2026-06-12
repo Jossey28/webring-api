@@ -18,6 +18,10 @@ class Member(BaseModel):
 MemberList: TypeAlias = list[Member]
 MemberListModel = TypeAdapter(MemberList)
 
+input_buffer = (
+    io.BytesIO()
+)  # TODO! Figure out non-global method of implenting shared state across files. fastapi_globals isn't working for the buffer
+
 
 def load_data():
     path: Path = g.json_path
@@ -62,15 +66,36 @@ def load_data():
 
                 sys.exit(1)
 
-    input_buffer = io.BytesIO()
+    # input_buffer = io.BytesIO()
     input_buffer.write(MemberListModel.dump_json(members))
     input_buffer.seek(0)  # Go back to start since write leaves it at the end
 
-    g.input_buffer = input_buffer
+
+def read_input_buffer() -> bytes:
+    try:
+        return input_buffer.read()
+    except Exception as e:
+        import sys
+
+        print(f"Unable to read input buffer: {e}\nQuitting Early")
+        sys.exit(1)
+
+
+def write_input_buffer(member: str):
+    try:
+        member_valid = Member.model_validate_json(member)
+        input_buffer.write(Member.model_dump_json(member_valid).encode("utf-8"))
+    except ValidationError as e:
+        print(f"Coudln't validate {member}\nError: {e}")
+        raise
+    except Exception as e:
+        print(
+            f"Caught unknown exception in write_input_buffer function\nError: {e}\nContinuing execution"
+        )
 
 
 @repeat_every(seconds=60 * 5)  # Every 5 minutes we save to disk
-def save_data() -> None:
+async def save_data() -> None:
     import os
 
     path: Path = g.json_path

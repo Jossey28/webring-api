@@ -5,6 +5,7 @@ from pathlib import Path
 @dataclass
 class Config:
     json_path: Path
+    default_ring: str
     api_keys: list[str] | None
 
 
@@ -12,6 +13,7 @@ def init_app() -> Config:
     settings = init_envs()
 
     api_key_list = settings.get("api_key")
+    default_ring = settings.get("default_ring", "main")
     json_path = Path(settings.get("json_path", ""))
 
     if not json_path.is_file():
@@ -46,12 +48,12 @@ def init_app() -> Config:
         api_keys = api_key_list.split(",")
         if len(api_keys) == 0:
             print("API_KEY env var is empty. Running without key protection")
-            return Config(json_path, None)
-        return Config(json_path, api_keys)
+            return Config(json_path, default_ring, api_keys)
+        return Config(json_path, default_ring, api_keys)
 
     else:
         print("API_KEY env var not set. Running without key protection")
-        config = Config(json_path, None)
+        config = Config(json_path, default_ring, None)
 
         return config
 
@@ -64,9 +66,11 @@ def init_envs() -> dict[str, str]:
 
     api_key = os.getenv("API_KEYS", "")
     json_path = os.getenv("JSON_DATABASE", "")
+    default_ring = os.getenv("DEFAULT_RING", "")
 
     config: dict[str, str] = dict()
     config["api_key"] = api_key
     config["json_path"] = json_path
+    config["default_ring"] = default_ring
 
     return config

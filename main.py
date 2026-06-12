@@ -1,9 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi_globals import GlobalsMiddleware, g
 import uvicorn
 
 from setup import init_app
-from helpers.json_helpers import load_data
+from helpers.json_helpers import Member, MemberListModel, load_data, read_input_buffer
 
 # import helpers.json_models as json_models
 
@@ -12,18 +12,23 @@ app.add_middleware(GlobalsMiddleware)
 
 
 @app.get("/")
-def read_root():
-    return {"Hello, World"}
+def read_root(request: Request):
+    return {
+        f"Hello there! Navigate to {request.base_url}webring/all to get all members"
+    }
 
 
-@app.get("/webring/{url}")
-def read_item(item_id: str, q: str | None = None):  # type: ignore
-    return {"item_id": item_id, "q": q}  # type: ignore
+@app.get("/webring/all")
+def read_default_ring() -> list[Member]:
+    input_buffer = read_input_buffer()
+    members: list[Member] = MemberListModel.validate_json(input_buffer)
+    members_valid = [member for member in members if member.ring_name == g.default_ring]
+    return members_valid
 
 
-@app.put("/items/{item_id}")
-def update_item(item_id: int, item: Item):  # type: ignore
-    return {"item_name": item.name, "item_id": item_id}  # type: ignore
+# @app.get("/webring/{url}")
+# def read_item(item_id: str):
+#     return {"item_id": item_id}
 
 
 def main():
@@ -31,6 +36,7 @@ def main():
 
     g.api_key = config.api_keys
     g.json_path = config.json_path
+    g.default_ring = config.default_ring
 
     load_data()
     uvicorn.run("main:app", host="localhost", port=8080, reload=True)
