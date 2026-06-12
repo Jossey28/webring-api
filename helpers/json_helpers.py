@@ -24,7 +24,6 @@ input_buffer = (
 
 
 def load_data():
-    print("Starting load data function")
     path: Path = g.json_path
     raw_json = path.read_text()
     members: list[Member] = list()
@@ -67,9 +66,7 @@ def load_data():
 
                 sys.exit(1)
 
-    # input_buffer = io.BytesIO()
     input_buffer.write(MemberListModel.dump_json(members))
-    print(f"printing input buffer: {input_buffer.read()}")
     input_buffer.seek(0)  # Go back to start since write leaves it at the end
 
 

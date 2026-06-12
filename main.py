@@ -36,8 +36,12 @@ def read_root(request: Request):
 def read_default_ring() -> list[Member]:
     input_buffer = read_input_buffer()
     members: list[Member] = MemberListModel.validate_json(input_buffer)
-    # members_valid = [member for member in members if member.ring_name == g.default_ring]
-    return members
+    members_valid = [member for member in members if member.ring_name == g.default_ring]
+    print(f"default 1 is: {g.default_ring}")
+    print(f"default 2 is: {g.json_path}")
+    print(f"default 3 is: {g.api_key}")
+
+    return members_valid
 
 
 # @app.get("/webring/{url}")
@@ -46,7 +50,7 @@ def read_default_ring() -> list[Member]:
 
 
 def main():
-    uvicorn.run("main:app", host="localhost", port=8080, reload=True)
+    uvicorn.run("main:app", host="localhost", port=8080, reload=False)
 
 
 if __name__ == "__main__":
