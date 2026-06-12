@@ -6,7 +6,7 @@ from sqlmodel import Session, select
 import uvicorn
 
 from setup import init_app
-from helpers.db import Member, get_all_members, get_db_session
+from helpers.db import Member, Ring, get_all_members, get_db_session
 
 
 @asynccontextmanager
@@ -29,26 +29,17 @@ def read_root(request: Request):
     }
 
 
-# @app.get("/webring/all", response_model=list[Member])
-# def read_default_ring(
-#     request: Request, all_members: list[Member] = Depends(get_all_members)
-# ):
-#     default_members: list[Member] = list()
-#     for member in all_members:
-#         if request.app.state.default_ring in member.rings:
-#             default_members.append(member)
-#     return default_members
-
-
-@app.get("/webring/{ring_name}", response_model=list[Member])
-def read_item(ring_name: str, all_members: list[Member] = Depends(get_all_members)):
-    ring_members: list[Member] = list()
+@app.get("/webring/all", response_model=list[Member])
+def read_default_ring(
+    request: Request, all_members: list[Member] = Depends(get_all_members)
+):
     return all_members
 
 
-# @app.get("/dump")
-# def dump_db(session: Session = Depends(get_db_session)):
-#     return session.exec(select(Row))
+@app.get("/webring/{ring_name}")
+def read_item(ring_name: str, all_members: list[Member] = Depends(get_all_members)):
+    return all_members
+
 
 # @app.get("/next/{ring_name}/{owner}", response_model=Member)
 # def read_next_from_owner(

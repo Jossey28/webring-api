@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from sqlmodel import (
     Field,
@@ -9,6 +9,8 @@ from sqlmodel import (
     SQLModel,
     JSON,
 )
+
+from fastapi import HTTPException, Request, status
 
 
 class Member(SQLModel):
@@ -99,7 +101,7 @@ def init_db(db_path: Path):
 
         session.add(
             Ring(
-                ring_name="Apple",
+                ring_name="apple",
                 members=[
                     Member(
                         index=1,
@@ -123,7 +125,25 @@ def get_db_session():
         yield session
 
 
-def get_all_members(ring_name: str) -> list[Ring]:
+def get_all_members(request: Request, ring_name: str | None = None) -> list[Member]:
     with Session(engine) as session:
-        result = list(session.exec(select(Ring)).all())
-        return result
+        ring = session.exec(
+            select(Ring).where(Ring.ring_name == request.app.state.default_ring)
+        ).first()
+        if ring is not None and request.url.path == "/webring/all":
+            memebers: list[Member] = list()
+            for member in ring.members:
+                memebers.append(Member.model_validate(member))
+            return memebers
+
+        ring = session.exec(select(Ring).where(Ring.ring_name == ring_name)).first()
+        if ring is not None:
+            memebers: list[Member] = list()
+            for member in ring.members:
+                memebers.append(Member.model_validate(member))
+            return memebers
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ring doesn't exist in database",
+        )
