@@ -5,45 +5,50 @@ from pathlib import Path
 @dataclass
 class Config:
     json_path: Path
-    api_key: str | None
+    api_keys: list[str] | None
 
 
 def init_app() -> Config:
     settings = init_envs()
 
-    api_key = settings.get("api_key")
+    api_key_list = settings.get("api_key")
     json_path = Path(settings.get("json_path", ""))
 
     if not json_path.is_file():
         import sys
 
         print(
-            f"Json path configured to {json_path}. \nIt's either not set or configured isn't a valid path\n\nDo you want to create a JSON database in ./data/database.json?"
+            f"Json path configured to {json_path}. \nIt's either not set or configured isn't a valid path\n\nDo you want to create a JSON database in ./data/database.jsonl?"
         )
 
         answer = input("y/N: ")
 
-        if answer.lower == "y":
+        if answer.lower() == "y":
             try:
-                f = open("data/database.json", "x")
+                f = open("data/database.jsonl", "x")
                 f.close()
             except FileExistsError:
-                print("./data/database.json file already exists. Using that instead")
+                print("./data/database.jsonl file already exists. Using that")
             except Exception as e:
                 import sys
 
                 print(f"Encountered exceptioned {e}\nQuitting Early")
                 sys.exit(1)
         else:
-            sys.exit("Refused to create database, Exiting now.")
+            sys.exit("User refused to create database, Exiting now.")
 
-    if api_key is None or api_key == "":
+    if api_key_list is not None:
+        api_keys = api_key_list.split(",")
+        if len(api_keys) == 0:
+            print("API_KEY env var is empty. Running without key protection")
+            return Config(json_path, None)
+        return Config(json_path, api_keys)
+
+    else:
         print("API_KEY env var not set. Running without key protection")
-        api_key = None
+        config = Config(json_path, None)
 
-    config = Config(json_path, api_key)
-
-    return config
+        return config
 
 
 def init_envs() -> dict[str, str]:
@@ -52,7 +57,7 @@ def init_envs() -> dict[str, str]:
 
     load_dotenv()
 
-    api_key = os.getenv("API_KEY", "")
+    api_key = os.getenv("API_KEYS", "")
     json_path = os.getenv("JSON_DATABASE", "")
 
     config: dict[str, str] = dict()

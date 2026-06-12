@@ -7,12 +7,14 @@ class Member(BaseModel):
     index: int = Field(gt=0)
     owner: str
     site: str
+    ring_name: str
 
-    prev_site: Member | None
-    next_site: Member | None
+
+def load_data():
+    path: Path = g.json_path
+    pass
 
 
 def save_data():
     path: Path = g.json_path
-
     pass
