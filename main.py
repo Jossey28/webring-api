@@ -1,12 +1,12 @@
 from contextlib import asynccontextmanager
+import select
 
-from fastapi import FastAPI, Request, Depends
-from sqlalchemy import func
+from fastapi import FastAPI, Request, Depends, status, HTTPException
 from sqlmodel import Session, select
 import uvicorn
 
 from setup import init_app
-from helpers.db import Member, get_db_session
+from helpers.db import Member, get_all_members, get_db_session
 
 
 @asynccontextmanager
@@ -25,27 +25,50 @@ app = FastAPI(title="Webring API", lifespan=lifespan)
 @app.get("/")
 def read_root(request: Request):
     return {
-        f"Hello there! Navigate to {request.base_url}webring/all to get all members"
+        f"Hello there! Navigate to {request.base_url}webring/{request.app.state.default_ring} to get all members of the default ring"
     }
 
 
-@app.get("/webring/all", response_model=list[Member])
-def read_default_ring(request: Request, session: Session = Depends(get_db_session)):
-    all_members = session.exec(
-        select(Member)
-    ).all()  # I can't get where to work with JSON T-T
-    default_members: list[Member] = list()
-    for member in all_members:
-        if request.app.state.default_ring in member.rings:
-            default_members.append(member)
-        else:
-            print(f"{member} not in default ring: {request.app.state.default_ring}")
-    return default_members
+# @app.get("/webring/all", response_model=list[Member])
+# def read_default_ring(
+#     request: Request, all_members: list[Member] = Depends(get_all_members)
+# ):
+#     default_members: list[Member] = list()
+#     for member in all_members:
+#         if request.app.state.default_ring in member.rings:
+#             default_members.append(member)
+#     return default_members
 
 
-# @app.get("/webring/{url}")
-# def read_item(item_id: str):
-#     return {"item_id": item_id}
+@app.get("/webring/{ring_name}", response_model=list[Member])
+def read_item(ring_name: str, all_members: list[Member] = Depends(get_all_members)):
+    ring_members: list[Member] = list()
+    return all_members
+
+
+# @app.get("/dump")
+# def dump_db(session: Session = Depends(get_db_session)):
+#     return session.exec(select(Row))
+
+# @app.get("/next/{ring_name}/{owner}", response_model=Member)
+# def read_next_from_owner(
+#     ring_name: str, owner: str, session: Session = Depends(get_db_session)
+# ):
+#     current_index = session.exec(
+#         select(Member.index).where(Member.owner == owner)
+#     ).first()
+
+#     if current_index is None:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="")
+
+#     return session.exec(select(Member).where(Member.index == current_index))
+
+
+# @app.get("/prev/{ring_name}/{owner}", response_model=Member)
+# def read_prev_from_owner(
+#     ring_name: str, owner: str, session: Session = Depends(get_db_session)
+# ):
+#     pass
 
 
 def main():
