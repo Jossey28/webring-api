@@ -1,16 +1,16 @@
 from fastapi import HTTPException, status, Security
 from fastapi.security import APIKeyHeader, APIKeyQuery
-from fastapi_globals import g
 
 api_key_query = APIKeyQuery(name="api-key", auto_error=False)
 api_key_header = APIKeyHeader(name="x-api-key", auto_error=False)
+
+API_KEYS = ["TMP1", "TMP2"]
 
 
 def get_api_key(  # https://joshdimella.com/blog/adding-api-key-auth-to-fast-api#understanding-api-key-authentication
     api_key_query: str = Security(api_key_query),
     api_key_header: str = Security(api_key_header),
 ) -> str:
-    API_KEYS: list[str] = g.api_keys
 
     if api_key_header in API_KEYS:
         return api_key_header

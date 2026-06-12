@@ -1,10 +1,7 @@
 from pathlib import Path
 import io
-import tempfile
 from typing import TypeAlias
 from pydantic import BaseModel, TypeAdapter, Field, ValidationError
-from fastapi_globals import g
-from fastapi_utils.tasks import repeat_every
 
 
 class Member(BaseModel):
@@ -18,14 +15,9 @@ class Member(BaseModel):
 MemberList: TypeAlias = list[Member]
 MemberListModel = TypeAdapter(MemberList)
 
-input_buffer = (
-    io.BytesIO()
-)  # TODO! Figure out non-global method of implenting shared state across files. fastapi_globals isn't working for the buffer
 
-
-def load_data():
-    path: Path = g.json_path
-    raw_json = path.read_text()
+def load_data(json_path: Path):
+    raw_json = json_path.read_text()
     members: list[Member] = list()
     ignore_order = False
 
@@ -91,18 +83,3 @@ def write_input_buffer(member: str):
         print(
             f"Caught unknown exception in write_input_buffer function\nError: {e}\nContinuing execution"
         )
-
-
-@repeat_every(seconds=60 * 5)  # Every 5 minutes we save to disk
-async def save_data() -> None:
-    import os
-
-    path: Path = g.json_path
-    input_buffer: io.BytesIO = g.input_buffer
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".jsonl") as tmp_file:
-        tmp_file.write(
-            input_buffer.read()
-        )  # Write to tmp to prevent data corruption. os.replace is instant (atmoic); https://stackoverflow.com/questions/51862186/is-os-replace-atomic-on-windows
-
-    os.replace(tmp_file.name, path)
