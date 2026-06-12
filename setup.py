@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from pathlib import Path
+from helpers.db import init_db
 
 
 @dataclass
 class Config:
-    json_path: Path
     default_ring: str
     api_keys: list[str] | None
 
@@ -12,16 +12,16 @@ class Config:
 def init_app() -> Config:
     import os, dotenv, typing
 
-    dotenv.load_dotenv(dotenv_path=".env")
+    dotenv.load_dotenv(dotenv_path=".env", override=True)
 
     api_keys = os.getenv("API_KEYS")
-    json_path = os.getenv("JSON_DATABASE")
+    db_path = os.getenv("SQL_DATABASE")
     default_ring = os.getenv("DEFAULT_RING", "main")
 
-    json_path = Path(typing.cast(str, json_path))
-    if not json_path.is_file():
+    db_path = Path(typing.cast(str, db_path))
+    if not db_path.is_file():
         raise SystemExit(
-            f"Unable to validate the provided path: {json_path} using env var. Make sure to follow the example file"
+            f"Unable to validate the provided path: {db_path} using env var. Make sure to create the sqlite file before running the program"
         )
 
     if api_keys is None:
@@ -30,4 +30,6 @@ def init_app() -> Config:
         api_keys = [key for key in api_keys.split(",")]
         assert len(api_keys) != 0
 
-    return Config(json_path=json_path, default_ring=default_ring, api_keys=api_keys)
+    init_db(db_path)
+
+    return Config(default_ring=default_ring, api_keys=api_keys)
