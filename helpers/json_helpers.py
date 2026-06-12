@@ -24,6 +24,7 @@ input_buffer = (
 
 
 def load_data():
+    print("Starting load data function")
     path: Path = g.json_path
     raw_json = path.read_text()
     members: list[Member] = list()
@@ -32,20 +33,20 @@ def load_data():
     for index, line in enumerate(raw_json.splitlines()):
         try:
             member_line = Member.model_validate_json(line)
-            if index != member_line.index and not ignore_order:
+            if (index + 1) != member_line.index and not ignore_order:
                 print(
-                    f"Line {index} contains index {member_line.index}, this means your jsonl file- indexs aren't sequential, is this intended?"
+                    f"\nLine {index} contains index {member_line.index}, this means your jsonl file- indexs aren't sequential, is this intended?"
                 )
 
-                should_ignore_order = input("y/N")
+                should_ignore_order = input("y/N: ")
                 if should_ignore_order.lower() == "y":
                     ignore_order = True
                     print(
-                        "Since this is intended the program won't stop for this again"
+                        "\nSince this is intended the program won't stop for this again"
                     )
                 else:
-                    print("Since this isn't intended, do you want to exit safetly?")
-                    exit_safely = input("Y/n")
+                    print("\nSince this isn't intended, do you want to exit safetly?")
+                    exit_safely = input("Y/n: ")
                     if exit_safely.lower() == "n":
                         continue
                     else:
@@ -68,6 +69,7 @@ def load_data():
 
     # input_buffer = io.BytesIO()
     input_buffer.write(MemberListModel.dump_json(members))
+    print(f"printing input buffer: {input_buffer.read()}")
     input_buffer.seek(0)  # Go back to start since write leaves it at the end
 
 

@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi_globals import GlobalsMiddleware, g
 import uvicorn
@@ -5,9 +7,21 @@ import uvicorn
 from setup import init_app
 from helpers.json_helpers import Member, MemberListModel, load_data, read_input_buffer
 
-# import helpers.json_models as json_models
 
-app = FastAPI(title="Webring API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    config = init_app()
+
+    g.api_key = config.api_keys
+    g.json_path = config.json_path
+    g.default_ring = config.default_ring
+
+    load_data()
+
+    yield
+
+
+app = FastAPI(title="Webring API", lifespan=lifespan)
 app.add_middleware(GlobalsMiddleware)
 
 
@@ -22,8 +36,8 @@ def read_root(request: Request):
 def read_default_ring() -> list[Member]:
     input_buffer = read_input_buffer()
     members: list[Member] = MemberListModel.validate_json(input_buffer)
-    members_valid = [member for member in members if member.ring_name == g.default_ring]
-    return members_valid
+    # members_valid = [member for member in members if member.ring_name == g.default_ring]
+    return members
 
 
 # @app.get("/webring/{url}")
@@ -32,13 +46,6 @@ def read_default_ring() -> list[Member]:
 
 
 def main():
-    config = init_app()
-
-    g.api_key = config.api_keys
-    g.json_path = config.json_path
-    g.default_ring = config.default_ring
-
-    load_data()
     uvicorn.run("main:app", host="localhost", port=8080, reload=True)
 
 

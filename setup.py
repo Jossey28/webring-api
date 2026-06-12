@@ -34,7 +34,7 @@ def init_app() -> Config:
                 )
                 sys.exit(1)
             except FileExistsError:
-                print("./data/database.jsonl file already exists. Using that")
+                print("\n./data/database.jsonl file already exists. Using that")
                 json_path = Path("./data/database.jsonl")
             except Exception as e:
                 import sys
