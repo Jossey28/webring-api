@@ -4,14 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <title>The Bestest Site</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- <link
+    <link
         href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Google+Sans+Code:ital,wght,MONO@0,300..800,1;1,300..800,1&family=Space+Grotesk:wght@300..700&display=swap"
         rel="stylesheet"> -->
     <style>
+        html {
+            overflow: hidden;
+        }
+
         body {
-            font-family: "Space Grotesk";
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
             background-color: #461959;
             color: #CD6688;
 
@@ -48,32 +52,38 @@
             padding: 5px
         }
     </style>
-    <script type="text/javascript">
+    <script>
+
         document.addEventListener("DOMContentLoaded", function () {
+            var prev_member, next_member = get_api_data();
+        });
+
+        async function get_api_data() {
             const API_BASE = "https://webring.homecamp.biz";
-            const API_KEY = "DKmWzG5AmVy67kGmzpoO14TeaUlFJNZK" // Hard coded API_KEY for tesing. Don't try using it.
+            const API_KEY = "DKmWzG5AmVy67kGmzpoO14TeaUlFJNZK" // Hard coded API_KEY for tesing. Don't try using it, It won't work.
             const MY_INDEX = 1
 
-            const PREV_MEMBER = fetch(`${API_BASE}/prev/index/test-ring/${MY_INDEX}`, {
+            const PREV_MEMBER = await (`${API_BASE}/prev/index/test-ring/${MY_INDEX}`, {
                 method: "GET",
                 headers: {
                     "x-api-key": `${API_KEY}`
                 }
             })
 
-            const NEXT_MEMBER = fetch(`${API_BASE}/next/index/test-ring/${MY_INDEX}`, {
+            const NEXT_MEMBER = await (`${API_BASE}/next/index/test-ring/${MY_INDEX}`, {
                 method: "GET",
                 headers: {
                     "x-api-key": `${API_KEY}`
                 }
             })
 
-            var left_button = document.getElementById("left-button");
-            var right_button = document.getElementById("right-button");
+            const prev_json = PREV_MEMBER.json()
+            const next_json = NEXT_MEMBER.json()
 
-            left_button.setAttribute("href",);
-            right_button.setAttribute("href", `${api_base}/next/index/test-ring/1`);
-        });
+            return [prev_json, next_json]
+        }
+
+
     </script>
 </head>
 

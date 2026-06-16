@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Any
 
+from sqlalchemy import Column
 from sqlmodel import (
     Field,
     create_engine,
@@ -27,7 +28,10 @@ class Ring(SQLModel, table=True):
         default=None, primary_key=True
     )  # https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/#none-fields-nullable-columns; Set to null because database generates it, not code
 
+    api_keys: list[str] | None = Field(default=None, sa_column=Column(JSON))
+
     ring_name: str = Field(index=True)
+
     members: list[dict[str, Any]] = Field(default_factory=list, sa_type=JSON)
 
 
@@ -85,6 +89,7 @@ def init_db(db_path: Path):
         session.add(
             Ring(
                 ring_name="upcoming",
+                api_keys=["DKmWzG5AmVy67LGmzpoO14TeaUlFJNZK"],
                 members=[
                     Member(
                         index=1,
@@ -149,7 +154,7 @@ def get_all_members(request: Request, ring_name: str | None = None) -> list[Memb
         )
 
 
-def get_member_owner(ring_name: str, owner: str, request: Request) -> Member:
+def get_member_owner(request: Request, ring_name: str, owner: str) -> Member:
     with Session(engine) as session:
         ring = session.exec(select(Ring).where(Ring.ring_name == ring_name)).first()
 
@@ -195,7 +200,7 @@ def get_member_owner(ring_name: str, owner: str, request: Request) -> Member:
         )
 
 
-def get_member_index(ring_name: str, index: int, request: Request) -> Member:
+def get_member_index(request: Request, ring_name: str, index: int) -> Member:
     with Session(engine) as session:
         ring = session.exec(select(Ring).where(Ring.ring_name == ring_name)).first()
 
@@ -241,7 +246,7 @@ def get_member_index(ring_name: str, index: int, request: Request) -> Member:
         )
 
 
-def get_member_site(ring_name: str, site: str, request: Request) -> Member:
+def get_member_site(request: Request, ring_name: str, site: str) -> Member:
     with Session(engine) as session:
         ring = session.exec(select(Ring).where(Ring.ring_name == ring_name)).first()
 

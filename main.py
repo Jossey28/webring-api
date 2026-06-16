@@ -23,7 +23,7 @@ admin.add_view(RingAdmin)
 
 
 @app.get("/")
-def read_root(request: Request):
+def read_root(request: Request) -> set[str]:
     return {
         f"Hello there! Navigate to {request.base_url}webring/{request.app.state.default_ring} to get all members of the default ring"
     }
@@ -98,7 +98,7 @@ def read_prev_from_site(
     site: str,
     prev: Member = Depends(get_member_index),
 ):
-    return next
+    return prev
 
 
 def main():
