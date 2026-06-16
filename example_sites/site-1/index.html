@@ -1,24 +1,28 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <title>The Bestest Site</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
+    <!-- <link
         href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Google+Sans+Code:ital,wght,MONO@0,300..800,1;1,300..800,1&family=Space+Grotesk:wght@300..700&display=swap"
-        rel="stylesheet">
+        rel="stylesheet"> -->
     <style>
         body {
             font-family: "Space Grotesk";
             background-color: #461959;
             color: #CD6688;
+
+            font-size: 1.5rem;
         }
 
         .text-container {
             margin-top: auto;
             margin-bottom: auto;
+            height: 98vh;
+
             display: grid;
             grid-template-columns: 200px 1fr 250px;
             gap: 15px
@@ -28,34 +32,65 @@
             margin: auto;
         }
 
+        .center {
+            text-align: center;
+        }
+
         .button {
             text-decoration: none;
-            color: #AED8CC;
+            color: #7A316F;
+            background-color: #AED8CC;
 
-            border-width: 50px red;
+            border-style: solid;
+            border-width: 2px;
+            border-radius: 5px;
+
+            padding: 5px
         }
     </style>
-    <script>
-        var api_base = "https://webring.homecamp.biz/";
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            const API_BASE = "https://webring.homecamp.biz";
+            const API_KEY = "DKmWzG5AmVy67kGmzpoO14TeaUlFJNZK" // Hard coded API_KEY for tesing. Don't try using it.
+            const MY_INDEX = 1
 
+            const PREV_MEMBER = fetch(`${API_BASE}/prev/index/test-ring/${MY_INDEX}`, {
+                method: "GET",
+                headers: {
+                    "x-api-key": `${API_KEY}`
+                }
+            })
 
+            const NEXT_MEMBER = fetch(`${API_BASE}/next/index/test-ring/${MY_INDEX}`, {
+                method: "GET",
+                headers: {
+                    "x-api-key": `${API_KEY}`
+                }
+            })
+
+            var left_button = document.getElementById("left-button");
+            var right_button = document.getElementById("right-button");
+
+            left_button.setAttribute("href",);
+            right_button.setAttribute("href", `${api_base}/next/index/test-ring/1`);
+        });
     </script>
 </head>
 
 <body>
     <div class="text-container">
-        <div class="container-item left button">
-            <a class="button" href="http://localhost:8080">
+        <div class="container-item">
+            <a id="left-button" class="button" href="#">
                 To the left!
             </a>
         </div>
         <div class="container-item center">
             <h1>Welcome to my siteeee, it's a scary purple</h1>
-            <h2>My text is a lot light though</h2>
-            <p>Click left or right to find out more</p>
+            <h2>My text is a lot lighter though</h2>
+            <p>Click left or right to see my friend's sites</p>
         </div>
-        <div class="container-item right">
-            <a class="button" href="http://localhost:8080">
+        <div class="container-item">
+            <a id="right-button" class="button" href="#">
                 To the Right!
             </a>
         </div>
