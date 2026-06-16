@@ -237,7 +237,7 @@ def get_member_index(ring_name: str, index: int, request: Request) -> Member:
 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Owner doesn't exist in ring",
+            detail="Index doesn't exist in ring",
         )
 
 
@@ -283,5 +283,5 @@ def get_member_site(ring_name: str, site: str, request: Request) -> Member:
 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Owner doesn't exist in ring",
+            detail="Site doesn't exist in ring",
         )

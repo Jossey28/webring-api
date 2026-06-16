@@ -1,23 +1,25 @@
-from contextlib import asynccontextmanager
-
 from fastapi import FastAPI, Request, Depends
+from sqladmin import Admin, ModelView
 import uvicorn
 
 from setup import init_app
-from helpers.db import Member, get_all_members, get_member_index, get_member_owner
+from helpers.db import Member, Ring, get_all_members, get_member_index, get_member_owner
+import helpers.db
+
+config = init_app()
+app = FastAPI(title="Webring API")
+
+app.state.api_key = config.api_keys
+app.state.default_ring = config.default_ring
+
+admin = Admin(app, helpers.db.engine)
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    config = init_app()
-
-    app.state.api_key = config.api_keys
-    app.state.default_ring = config.default_ring
-
-    yield
+class RingAdmin(ModelView, model=Ring):
+    column_list = [Ring.id, Ring.ring_name, Ring.members]  # type: ignore
 
 
-app = FastAPI(title="Webring API", lifespan=lifespan)
+admin.add_view(RingAdmin)
 
 
 @app.get("/")
