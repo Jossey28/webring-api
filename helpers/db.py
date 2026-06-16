@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from sqlmodel import (
     Field,
@@ -17,6 +17,7 @@ class Member(SQLModel):
     index: int
     owner: str
     site: str
+    eightyeight: str | None = Field(default=None)
 
 
 class Ring(SQLModel, table=True):
@@ -130,6 +131,7 @@ def get_all_members(request: Request, ring_name: str | None = None) -> list[Memb
         ring = session.exec(
             select(Ring).where(Ring.ring_name == request.app.state.default_ring)
         ).first()
+
         if ring is not None and request.url.path == "/webring/all":
             memebers: list[Member] = list()
             for member in ring.members:
@@ -138,12 +140,148 @@ def get_all_members(request: Request, ring_name: str | None = None) -> list[Memb
 
         ring = session.exec(select(Ring).where(Ring.ring_name == ring_name)).first()
         if ring is not None:
-            memebers: list[Member] = list()
-            for member in ring.members:
-                memebers.append(Member.model_validate(member))
+            memebers = [Member.model_validate(member) for member in ring.members]
             return memebers
 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Ring doesn't exist in database",
+        )
+
+
+def get_member_owner(ring_name: str, owner: str, request: Request) -> Member:
+    with Session(engine) as session:
+        ring = session.exec(select(Ring).where(Ring.ring_name == ring_name)).first()
+
+        if ring is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Ring doesn't exist in database",
+            )
+
+        members = [Member.model_validate(member) for member in ring.members]
+
+        if len(members) == 0:
+            raise HTTPException(
+                status_code=status.HTTP_410_GONE, detail="This ring has no members"
+            )
+
+        if request.url.path.find("/next/owner/") != -1:
+            get_next = True
+        else:
+            get_next = False
+
+        members_iter = iter(members)
+        prev = None
+        for member in members_iter:
+            if member.owner == owner:
+                if get_next:
+                    next_member = next(members_iter, None)
+                    if next_member is not None:
+                        return next_member
+                    else:
+                        return members[0]
+                else:
+                    if prev is not None:
+                        return prev
+                    else:
+                        return members[-1]
+
+            prev = member
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Owner doesn't exist in ring",
+        )
+
+
+def get_member_index(ring_name: str, index: int, request: Request) -> Member:
+    with Session(engine) as session:
+        ring = session.exec(select(Ring).where(Ring.ring_name == ring_name)).first()
+
+        if ring is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Ring doesn't exist in database",
+            )
+
+        members = [Member.model_validate(member) for member in ring.members]
+
+        if len(members) == 0:
+            raise HTTPException(
+                status_code=status.HTTP_410_GONE, detail="This ring has no members"
+            )
+
+        if request.url.path.find("/next/index/") != -1:
+            get_next = True
+        else:
+            get_next = False
+
+        members_iter = iter(members)
+        prev = None
+        for member in members_iter:
+            if member.index == index:
+                if get_next:
+                    next_member = next(members_iter, None)
+                    if next_member is not None:
+                        return next_member
+                    else:
+                        return members[0]
+                else:
+                    if prev is not None:
+                        return prev
+                    else:
+                        return members[-1]
+
+            prev = member
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Owner doesn't exist in ring",
+        )
+
+
+def get_member_site(ring_name: str, site: str, request: Request) -> Member:
+    with Session(engine) as session:
+        ring = session.exec(select(Ring).where(Ring.ring_name == ring_name)).first()
+
+        if ring is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Ring doesn't exist in database",
+            )
+
+        members = [Member.model_validate(member) for member in ring.members]
+
+        if len(members) == 0:
+            raise HTTPException(
+                status_code=status.HTTP_410_GONE, detail="This ring has no members"
+            )
+
+        if request.url.path.find("/next/site/") != -1:
+            get_next = True
+        else:
+            get_next = False
+
+        members_iter = iter(members)
+        prev = None
+        for member in members_iter:
+            if member.site == site:
+                if get_next:
+                    next_member = next(members_iter, None)
+                    if next_member is not None:
+                        return next_member
+                    else:
+                        return members[0]
+                else:
+                    if prev is not None:
+                        return prev
+                    else:
+                        return members[-1]
+
+            prev = member
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Owner doesn't exist in ring",
         )
