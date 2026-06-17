@@ -68,14 +68,14 @@
             const API_KEY = "DKmWzG5AmVy67kGmzpoO14TeaUlFJNZK" // Hard coded API_KEY for tesing. Don't try using it, It won't work.
             const MY_INDEX = 2
 
-            const PREV_MEMBER = await fetch(`${API_BASE}/prev/index/test-ring/${MY_INDEX}`, {
+            const PREV_MEMBER = await fetch(`${API_BASE}/prev/index/demo-site/${MY_INDEX}`, {
                 method: "GET",
                 headers: {
                     "x-api-key": `${API_KEY}`
                 }
             })
 
-            const NEXT_MEMBER = await fetch(`${API_BASE}/next/index/test-ring/${MY_INDEX}`, {
+            const NEXT_MEMBER = await fetch(`${API_BASE}/next/index/demo-site/${MY_INDEX}`, {
                 method: "GET",
                 headers: {
                     "x-api-key": `${API_KEY}`
