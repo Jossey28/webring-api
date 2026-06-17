@@ -62,16 +62,6 @@
     </style>
     <script>
 
-        document.addEventListener("DOMContentLoaded", function () {
-            var prev_member, next_member = get_api_data();
-
-            document.getElementById("left-button").href = prev_member.site;
-            document.getElementById("right-button").href = next_member.site;
-
-            document.getElementById("left-member-data").innerText = `${prev_member.owner}'s (index: ${prev_member.index}) site. `
-            document.getElementById("right-member-data").innerText = `${next_member.owner}'s (index: ${next_member.index}) site. `
-        });
-
         async function get_api_data() {
             const API_BASE = "https://webring.homecamp.biz";
             const API_KEY = "DKmWzG5AmVy67kGmzpoO14TeaUlFJNZK" // Hard coded API_KEY for tesing. Don't try using it, It won't work.
@@ -95,6 +85,24 @@
             const next_json = await NEXT_MEMBER.json()
 
             return [prev_json, next_json]
+        }
+
+
+        async function modify_data() {
+            document.addEventListener("DOMContentLoaded", function () {
+                var prev_member, next_member = get_api_data();
+
+                document.getElementById("left-button").href = prev_member.site;
+                document.getElementById("right-button").href = next_member.site;
+
+                document.getElementById("left-member-data").innerText = `${prev_member.owner}'s (index: ${prev_member.index}) site. `
+                document.getElementById("right-member-data").innerText = `${next_member.owner}'s (index: ${next_member.index}) site. `
+            });
+        }
+
+        async function run() {
+            await get_api_data()
+            await modify_data
         }
 
 
