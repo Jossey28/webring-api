@@ -50,74 +50,23 @@ def init_db(db_path: Path):
     with Session(engine) as session:
         session.add(
             Ring(
-                ring_name="main",
+                ring_name="demo-sites",
+                api_keys=["DKmWzG5AmVy67kGmzpoO14TeaUlFJNZK"],
                 members=[
                     Member(
                         index=1,
-                        owner="Jossey28",
-                        site="https://dev-site.homecamp.biz",
+                        owner="First Owner",
+                        site="https://site-1.homecamp.biz",
                     ).model_dump(),
                     Member(
                         index=2,
-                        owner="Sir Exemplaris",
-                        site="https://example.com",
+                        owner="Second Owner",
+                        site="https://site-2.homecamp.biz",
                     ).model_dump(),
                     Member(
                         index=3,
-                        owner="Satya Nadella",
-                        site="https://www.microsoft.com",
-                    ).model_dump(),
-                    Member(
-                        index=4,
-                        owner="Sundar Pichai",
-                        site="https://google.com",
-                    ).model_dump(),
-                    Member(
-                        index=5,
-                        owner="Steve Jobs",
-                        site="https://apple.com",
-                    ).model_dump(),
-                    Member(
-                        index=6,
-                        owner="John Ternus",
-                        site="https://apple.com",
-                    ).model_dump(),
-                ],
-            )
-        )
-
-        session.add(
-            Ring(
-                ring_name="upcoming",
-                api_keys=["DKmWzG5AmVy67LGmzpoO14TeaUlFJNZK"],
-                members=[
-                    Member(
-                        index=1,
-                        owner="Jossey28",
-                        site="https://dev-site.homecamp.biz",
-                    ).model_dump(),
-                    Member(
-                        index=2,
-                        owner="John Ternus",
-                        site="https://apple.com",
-                    ).model_dump(),
-                ],
-            )
-        )
-
-        session.add(
-            Ring(
-                ring_name="apple",
-                members=[
-                    Member(
-                        index=1,
-                        owner="Steve Jobs",
-                        site="https://apple.com",
-                    ).model_dump(),
-                    Member(
-                        index=2,
-                        owner="John Ternus",
-                        site="https://apple.com",
+                        owner="Third Owner",
+                        site="https://site-3.homecamp.biz",
                     ).model_dump(),
                 ],
             )

@@ -18,8 +18,8 @@
 
         body {
             font-family: "Space Grotesk";
-            background-color: #461959;
-            color: #CD6688;
+            background-color: #FFE893;
+            color: #FFF6E3;
 
             font-size: 1.5rem;
 
@@ -36,6 +36,10 @@
             gap: 15px
         }
 
+        .visible-data {
+            font-size: 1rem;
+        }
+
         .container-item {
             margin: auto;
         }
@@ -46,8 +50,8 @@
 
         .button {
             text-decoration: none;
-            color: #7A316F;
-            background-color: #AED8CC;
+            color: #555049;
+            background-color: #FFF7D1;
 
             border-style: solid;
             border-width: 2px;
@@ -66,7 +70,7 @@
         async function get_api_data() {
             const API_BASE = "https://webring.homecamp.biz";
             const API_KEY = "DKmWzG5AmVy67kGmzpoO14TeaUlFJNZK" // Hard coded API_KEY for tesing. Don't try using it, It won't work.
-            const MY_INDEX = 1
+            const MY_INDEX = 3
 
             const PREV_MEMBER = await fetch(`${API_BASE}/prev/index/test-ring/${MY_INDEX}`, {
                 method: "GET",
@@ -95,7 +99,7 @@
 <body>
     <div class="text-container">
         <div class="container-item">
-            <p id="left-member-data">
+            <p id="left-member-data" class="visible-data">
                 loading user data
             </p>
             <a id="left-button" class="button" href="#">
@@ -103,12 +107,12 @@
             </a>
         </div>
         <div class="container-item center">
-            <h1>Welcome to my siteeee, it's a scary purple</h1>
-            <h2>My text is a lot lighter though</h2>
+            <h1>Hello! My site is a youthful yellow</h1>
+            <h2>Don't let my text blind your eyes!</h2>
             <p>Click left or right to see my friend's sites</p>
         </div>
         <div class="container-item">
-            <p id="right-member-data">
+            <p id="right-member-data" class="visible-data">
                 loading user data
             </p>
             <a id="right-button" class="button" href="#">

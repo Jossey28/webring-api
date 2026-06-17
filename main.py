@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from sqladmin import Admin, ModelView
 import uvicorn
 
@@ -8,6 +9,14 @@ import helpers.db
 
 config = init_app()
 app = FastAPI(title="Webring API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.state.api_key = config.api_keys
 app.state.default_ring = config.default_ring
@@ -58,7 +67,7 @@ def read_prev_from_owner(
     owner: str,
     prev: Member = Depends(get_member_owner),
 ):
-    return next
+    return prev
 
 
 @app.get("/next/index/{ring_name}/{index}", response_model=Member)
@@ -78,7 +87,7 @@ def read_prev_from_index(
     index: int,
     prev: Member = Depends(get_member_index),
 ):
-    return next
+    return prev
 
 
 @app.get("/next/site/{ring_name}/{site}", response_model=Member)
