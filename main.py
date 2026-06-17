@@ -111,7 +111,7 @@ def read_prev_from_site(
 
 
 def main():
-    uvicorn.run("main:app", host="localhost", port=8080, reload=False)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
 
 
 if __name__ == "__main__":
