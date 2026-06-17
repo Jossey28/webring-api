@@ -59,8 +59,13 @@
     <script>
 
         document.addEventListener("DOMContentLoaded", function () {
-            // var prev_member, next_member = get_api_data();
-            console.log(get_api_data())
+            var prev_member, next_member = get_api_data();
+
+            document.getElementById("left-button").href = prev_member.site;
+            document.getElementById("right-button").href = next_member.site;
+
+            document.getElementById("left-member-data").innerText = `${prev_member.owner}'s (index: ${prev_member.index}) site. `
+            document.getElementById("right-member-data").innerText = `${next_member.owner}'s (index: ${next_member.index}) site. `
         });
 
         async function get_api_data() {
