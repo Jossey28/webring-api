@@ -19,7 +19,9 @@ def init_app() -> Config:
     default_ring = os.getenv("DEFAULT_RING", "main")
 
     if not db_path:
-        raise SystemExit("db_path environment variable isn't set. make sure")
+        raise SystemExit(
+            "db_path environment variable isn't set. make sure to add it into your environment file"
+        )
 
     db_path = Path(db_path)
     if not db_path.is_file():
