@@ -1,13 +1,20 @@
 from fastapi import FastAPI, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from sqladmin import Admin, ModelView
-import uvicorn
+from starlette.middleware.sessions import SessionMiddleware
 
+from sqladmin import Admin, ModelView
+
+import uvicorn
+import secrets
+
+from helpers import auth
 from setup import init_app
 from helpers.db import Member, Ring, get_all_members, get_member_index, get_member_owner
 import helpers.db
 
 config = init_app()
+session_key = secrets.token_hex(32)
+
 app = FastAPI(title="Webring API")
 
 app.add_middleware(
@@ -18,10 +25,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.state.api_key = config.api_keys
-app.state.default_ring = config.default_ring
+# app.add_middleware(SessionMiddleware, secret_key=session_key)
 
-admin = Admin(app, helpers.db.engine)
+admin = Admin(
+    app,
+    helpers.db.engine,
+    authentication_backend=auth.AdminPageBackend(
+        secret_key=session_key,
+        admin_username=config.admin_username,
+        admin_password=config.admin_password,
+    ),
+)
 
 
 class RingAdmin(ModelView, model=Ring):
@@ -34,7 +48,7 @@ admin.add_view(RingAdmin)
 @app.get("/")
 def read_root(request: Request) -> set[str]:
     return {
-        f"Hello there! Navigate to {request.base_url}webring/{request.app.state.default_ring} to get all members of the default ring"
+        f"Hello there! Navigate to {request.base_url}webring/{config.default_ring} to get all members of the default ring"
     }
 
 

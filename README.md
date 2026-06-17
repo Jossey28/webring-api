@@ -169,6 +169,10 @@ graph LR
 ```
 
 ### Admin Management
+The API comes with a fairly minimal admin login page powered by SQLAdmin.
+
+![admin loging page](images/admin_login.png)
+*the admin login page*
 
 ![admin dashboard](images/admin_dashboard.png)
 *the primary page that shows when you access the admin endpoint*

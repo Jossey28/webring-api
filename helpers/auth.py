@@ -1,32 +1,49 @@
 from fastapi import Depends, HTTPException, status, Security
-from fastapi.security import APIKeyHeader, APIKeyQuery
+from starlette.requests import Request
 from sqlmodel import Session, select
+
+from fastapi.security import APIKeyHeader, APIKeyQuery
+from sqladmin.authentication import AuthenticationBackend
+
 from helpers.db import Ring, get_db_session
-import main
 
 api_key_query = APIKeyQuery(name="api-key", auto_error=False)
 api_key_header = APIKeyHeader(name="x-api-key", auto_error=False)
 
-ADMIN_DASHBOARD_API_KEYS = main.config.api_keys
 
+class AdminPageBackend(
+    AuthenticationBackend
+):  # https://stackoverflow.com/questions/79869816/how-to-work-sqladmin-token-and-secret-key-management#
+    def __init__(
+        self, secret_key: str, admin_username: str, admin_password: str
+    ) -> None:
+        super().__init__(secret_key)
 
-def get_api_key_admin(  # https://joshdimella.com/blog/adding-api-key-auth-to-fast-api#understanding-api-key-authentication
-    api_key_query: str = Security(api_key_query),
-    api_key_header: str = Security(api_key_header),
-) -> str | None:
+        self.admin_username = admin_username
+        self.admin_password = admin_password
 
-    if ADMIN_DASHBOARD_API_KEYS is None:
-        return ""
+        print(f"username: {self.admin_username}")
+        print(f"password: {self.admin_password}")
 
-    if api_key_query in ADMIN_DASHBOARD_API_KEYS:
-        return api_key_query
+    async def login(self, request: Request) -> bool:
+        form = await request.form()
+        username, password = form["username"], form["password"]
 
-    if api_key_header in ADMIN_DASHBOARD_API_KEYS:
-        return api_key_header
+        if username == self.admin_username and password == self.admin_password:
+            request.session.update({"token": "admin_authenticated"})
+            return True
 
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or missing API Key"
-    )
+        return False
+
+    async def logout(self, request: Request) -> bool:
+        request.session.clear()
+        return True
+
+    async def authenticate(self, request: Request) -> bool:
+        token = request.session.get("token")
+        if token == "admin_authenticated":
+            return True
+        return False
 
 
 def get_api_key_ring(
