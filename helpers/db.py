@@ -57,16 +57,19 @@ def init_db(db_path: Path):
                         index=1,
                         owner="First Owner",
                         site="https://site-1.homecamp.biz",
+                        eightyeight="https://cyber.dabamos.de/88x31/88by31.gif",
                     ).model_dump(),
                     Member(
                         index=2,
                         owner="Second Owner",
                         site="https://site-2.homecamp.biz",
+                        eightyeight="https://cyber.dabamos.de/88x31/anythingbut.gif",
                     ).model_dump(),
                     Member(
                         index=3,
                         owner="Third Owner",
                         site="https://site-3.homecamp.biz",
+                        eightyeight="https://cyber.dabamos.de/88x31/auto.gif",
                     ).model_dump(),
                 ],
             )

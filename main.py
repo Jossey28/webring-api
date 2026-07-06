@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.sessions import SessionMiddleware
 
 from sqladmin import Admin, ModelView
 
@@ -25,8 +24,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# app.add_middleware(SessionMiddleware, secret_key=session_key)
-
 admin = Admin(
     app,
     helpers.db.engine,
@@ -36,7 +33,6 @@ admin = Admin(
         admin_password=config.admin_password,
     ),
 )
-
 
 class RingAdmin(ModelView, model=Ring):
     column_list = [Ring.id, Ring.ring_name, Ring.members]  # type: ignore
